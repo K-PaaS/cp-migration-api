@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/auth-url: "https://$host/oauth2/auth"
+    nginx.ingress.kubernetes.io/auth-signin: "https://$host/oauth2/start?rd=$escaped_request_uri"
+  name: external-auth-oauth2
+  namespace: cp-portal
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: "${CP_MIGRATION_API_URI}"
+    http:
+      paths:
+      - backend:
+          service:
+            name: cp-migration-api
+            port:
+              number: 80
+        path: /
+        pathType: ImplementationSpecific
+  tls:
+  - hosts:
+    - "${CP_MIGRATION_API_URI}"
+    secretName: "${CP_MIGRATION_API_URI}-tls"

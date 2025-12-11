@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: oauth2-proxy
+  name: oauth2-proxy
+  namespace: cp-portal
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: oauth2-proxy
+  template:
+    metadata:
+      labels:
+        k8s-app: oauth2-proxy
+    spec:
+      containers:
+      - args:
+        - --skip-provider-button=true
+        - --ssl-insecure-skip-verify
+        - --provider=keycloak-oidc
+        - --upstream=file:///dev/null
+        - --oidc-issuer-url=${OAUTH2_OIDC_URL}/realms/$KEYCLOAK_CP_REALM
+        - --redirect-url=https://${INGRESS_HOST_DOMAIN}${OAUTH2_INGRESSPATH}/callback
+        - --http-address=0.0.0.0:4180
+        - --email-domain=*
+        - --cookie-secure=false
+        - --insecure-oidc-allow-unverified-email=true
+        - --pass-authorization-header=true
+        - --set-authorization-header=true
+        - --reverse-proxy
+        - --skip-jwt-bearer-tokens=true
+        - --extra-jwt-issuers=${OAUTH2_OIDC_ISSUER_URL}=${OAUTH2_CLIENT_ID}
+        env:
+        - name: OAUTH2_PROXY_CLIENT_ID
+          value: "$OAUTH2_CLIENT_ID"
+        - name: OAUTH2_PROXY_CLIENT_SECRET
+          value: "$OAUTH2_CLIENT_SECRET"
+        - name: OAUTH2_PROXY_COOKIE_SECRET
+          value: "$OAUTH2_PROXY_COOKIE_SECRET"
+        - name: OAUTH2_PROXY_REDIS_PASSWORD
+          value: "$OAUTH2_PROXY_REDIS_PASSWORD"
+        image: quay.io/oauth2-proxy/oauth2-proxy:latest
+        imagePullPolicy: Always
+        name: oauth2-proxy
+        ports:
+        - containerPort: 4180
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    k8s-app: oauth2-proxy
+  name: oauth2-proxy
+  namespace: cp-portal
+spec:
+  ports:
+  - name: http
+    port: 4180
+    protocol: TCP
+    targetPort: 4180
+  selector:
+    k8s-app: oauth2-proxy
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+  name: oauth2-proxy
+  namespace: cp-portal
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: "${CP_MIGRATION_API_URI}"
+    http:
+      paths:
+      - backend:
+          service:
+            name: oauth2-proxy
+            port:
+              number: 4180
+        path: /oauth2
+        pathType: Prefix

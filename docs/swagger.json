@@ -1,0 +1,154 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/v1/migration/operations/list": {
+            "post": {
+                "description": "Check bucket list.\nExample request body before encoding :\n{\n\"storageType\": \"s3\",\n\"endpoint\": \"http://url.com\",\n\"accessKeyId\": \"admin\",\n\"secretAccessKey\": \"tpsxj0812\",\n\"bucket\": \"\"\n}",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Migration"
+                ],
+                "summary": "Check bucket list",
+                "parameters": [
+                    {
+                        "description": "encode base64 model.StorageConfig",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.HybridPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/migration/sync/copy": {
+            "post": {
+                "description": "Copying Between Storage.\nExample request body before encoding :\n{\n\"src\": {\n\"storageType\": \"s3\",\n\"endpoint\": \"http://url.co.kr\",\n\"accessKeyId\": \"admin\",\n\"secretAccessKey\": \"admin\",\n\"bucket\": \"abc\"\n},\n\"dst\": {\n\"storageType\": \"s3\",\n\"endpoint\": \"http://url.com\",\n\"accessKeyId\": \"admin\",\n\"secretAccessKey\": \"admin\",\n\"bucket\": \"abcd\"\n}\n}",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Migration"
+                ],
+                "summary": "Copying Between Storage",
+                "parameters": [
+                    {
+                        "description": "encode base64 model.SyncConfig",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.HybridPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/migration/sync/sync": {
+            "post": {
+                "description": "Synchronize between storage.\nExample request body before encoding :\n{\n\"src\": {\n\"storageType\": \"s3\",\n\"endpoint\": \"http://url.co.kr\",\n\"accessKeyId\": \"admin\",\n\"secretAccessKey\": \"admin\",\n\"bucket\": \"abc\"\n},\n\"dst\": {\n\"storageType\": \"s3\",\n\"endpoint\": \"http://url.com\",\n\"accessKeyId\": \"admin\",\n\"secretAccessKey\": \"admin\",\n\"bucket\": \"abcd\"\n}\n}",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Migration"
+                ],
+                "summary": "Synchronize between storage",
+                "parameters": [
+                    {
+                        "description": "encode base64 model.SyncConfig",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.HybridPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "model.HybridPayload": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "string"
+                },
+                "iv": {
+                    "description": "IV            []byte `json:\"iv\"`",
+                    "type": "string"
+                },
+                "key": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

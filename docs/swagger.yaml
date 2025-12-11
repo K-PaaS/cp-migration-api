@@ -1,0 +1,144 @@
+definitions:
+  model.HybridPayload:
+    properties:
+      data:
+        type: string
+      iv:
+        description: IV            []byte `json:"iv"`
+        type: string
+      key:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /v1/migration/operations/list:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Check bucket list.
+        Example request body before encoding :
+        {
+        "storageType": "s3",
+        "endpoint": "http://url.com",
+        "accessKeyId": "admin",
+        "secretAccessKey": "tpsxj0812",
+        "bucket": ""
+        }
+      parameters:
+      - description: encode base64 model.StorageConfig
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/model.HybridPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: object
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Check bucket list
+      tags:
+      - Migration
+  /v1/migration/sync/copy:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Copying Between Storage.
+        Example request body before encoding :
+        {
+        "src": {
+        "storageType": "s3",
+        "endpoint": "http://url.co.kr",
+        "accessKeyId": "admin",
+        "secretAccessKey": "admin",
+        "bucket": "abc"
+        },
+        "dst": {
+        "storageType": "s3",
+        "endpoint": "http://url.com",
+        "accessKeyId": "admin",
+        "secretAccessKey": "admin",
+        "bucket": "abcd"
+        }
+        }
+      parameters:
+      - description: encode base64 model.SyncConfig
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/model.HybridPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Copying Between Storage
+      tags:
+      - Migration
+  /v1/migration/sync/sync:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Synchronize between storage.
+        Example request body before encoding :
+        {
+        "src": {
+        "storageType": "s3",
+        "endpoint": "http://url.co.kr",
+        "accessKeyId": "admin",
+        "secretAccessKey": "admin",
+        "bucket": "abc"
+        },
+        "dst": {
+        "storageType": "s3",
+        "endpoint": "http://url.com",
+        "accessKeyId": "admin",
+        "secretAccessKey": "admin",
+        "bucket": "abcd"
+        }
+        }
+      parameters:
+      - description: encode base64 model.SyncConfig
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/model.HybridPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Synchronize between storage
+      tags:
+      - Migration
+swagger: "2.0"

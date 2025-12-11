@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cp-migration-api-deployment
+  namespace: cp-portal
+spec:
+  selector:
+    matchLabels:
+      app: cp-migration-api
+  replicas: 1 # tells deployment to run 2 pods matching the template
+  template:
+    metadata:
+      labels:
+        app: cp-migration-api
+    spec:
+      containers:
+      - name: cp-migration-api
+        image: "${REPOSITORY_URL/$REPOSITORY_PROJECT_NAME/cp-migration-api:latest}"
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8901
+        envFrom:
+        - secretRef:
+            name: cp-migration-api-secret
+        - configMapRef:
+            name: cp-migration-api-config
+      imagePullSecrets:
+      - name: cp-regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cp-migration-api
+  namespace: cp-portal
+  labels:
+    app: cp-migration-api
+spec:
+  ports:
+  - port: 80
+    targetPort: 8901
+    protocol: TCP
+  selector:
+    app: cp-migration-api
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cp-migration-api-config
+  namespace: cp-portal
+  labels:
+    app: cp-portal
+data:
+  PROFILE: "${PROFILE}"
+  IS_ENCRYPTION: "${IS_ENCRYPTION}"
+
